@@ -1,0 +1,6 @@
+User: What is this tool?
+Assistant: It aggregates files or reformats conversations into AI context.
+Human: Can it handle ZIP files?
+AI: Yes, both folder and ZIP inputs are supported.
+Customer: What output formats?
+Agent: Markdown, plain text, and XML-tagged.

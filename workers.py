@@ -27,15 +27,18 @@ class AggregatorWorker(QThread):
         """
         Removes control characters that are invalid in XML 1.0.
         Allowed: #x9, #xA, #xD, and #x20-#xD7FF, #xE000-#xFFFD, #x10000-#x10FFFF
-        We'll replace any invalid char with a space or remove it.
         """
-        # Remove ASCII control chars except tab, newline, carriage return
-        # Also remove invalid Unicode surrogates 
-        # This regex matches any character not allowed in XML 1.0
         invalid_xml_chars = re.compile(
             '[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]'
         )
-        return invalid_xml_chars.sub(' ', text)  # replace with space
+        return invalid_xml_chars.sub(' ', text)
+
+    def escape_cdata(self, text: str) -> str:
+        """
+        Escape the CDATA end delimiter ']]>' so it doesn't prematurely close the CDATA section.
+        Standard technique: replace ']]>' with ']]]]><![CDATA[>'
+        """
+        return text.replace(']]>', ']]]]><![CDATA[>')
 
     def run(self):
         try:
@@ -107,10 +110,9 @@ class AggregatorWorker(QThread):
                     if fmt == 'md':
                         combined.append(f"\n## `{rel}`\n\n```\n{text.strip()}\n```\n")
                     elif fmt == 'xml':
-                        # Also escape XML special characters? Not necessary if we keep CDATA? 
-                        # But for safety, we'll wrap in CDATA if needed, or just assume text is clean.
-                        # Better to use CDATA to avoid escaping issues.
-                        combined.append(f'<FILE path="{rel}">\n<![CDATA[\n{text.strip()}\n]]>\n</FILE>\n')
+                        # Escape CDATA end delimiter and wrap in CDATA
+                        safe_text = self.escape_cdata(text.strip())
+                        combined.append(f'<FILE path="{rel}">\n<![CDATA[\n{safe_text}\n]]>\n</FILE>\n')
                     else:  # plain text
                         combined.append(f"\n{'='*80}\nFILE: {rel}\n{'='*80}\n{text}\n")
 

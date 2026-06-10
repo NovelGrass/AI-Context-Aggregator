@@ -53,7 +53,7 @@ def reformat_conversation(raw_text: str, output_format: str = 'md') -> str:
         if output_format == 'md':
             return f"## Conversation Transcript\n\n{raw_text}"
         elif output_format == 'xml':
-            return f"<conversation>\n{escape_xml(raw_text)}\n</conversation>"
+            return f"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<conversation>\n{escape_xml(raw_text)}\n</conversation>"
         else:
             return f"Conversation Transcript\n{'='*40}\n{raw_text}"
 
@@ -68,10 +68,10 @@ def reformat_conversation(raw_text: str, output_format: str = 'md') -> str:
         formatted = []
         for role, content in processed:
             tag = "user" if role == 'user' else "assistant"
-            # Escape content to prevent XML errors
             escaped_content = escape_xml(content)
             formatted.append(f"<{tag}>{escaped_content}</{tag}>")
-        return "\n".join(formatted)
+        # Wrap with root element and add XML declaration
+        return f"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<conversation>\n" + "\n".join(formatted) + "\n</conversation>"
 
     else:  # plain text
         formatted = []

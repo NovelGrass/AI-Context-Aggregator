@@ -1,7 +1,9 @@
-PyQt6>=6.5.0
-pathspec>=0.11.0
+PyQt6>=6.4.0
+PyQt6-WebEngine>=6.4.0
 pdfplumber>=0.10.0
-python-docx>=1.0.0
+python-docx>=0.8.11
 openpyxl>=3.1.0
 python-pptx>=0.6.21
-chardet>=5.2.0
+chardet>=5.0.0
+pathspec>=0.11.0
+tiktoken>=0.5.0
